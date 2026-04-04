@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # Message Broker with Management UI and Prometheus Exporter enabled by default
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq-service
+    ports:
+      - "5672:5672"   # RabbitMQ Protocol
+      - "15672:15672" # Management UI (Login: guest/guest)
+      - "15692:15692" # Prometheus Metrics Endpoint
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Metrics Storage
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-service
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  # Visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-service
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+
+  # Your Spring Boot App (Placeholder for your build)
+  app-service:
+    build: .
+    container_name: boot-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_PROMETHEUS_ENABLED=true
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
