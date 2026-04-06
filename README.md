@@ -35,3 +35,20 @@ This project acts as a Standardized Telemetry Blueprint. By utilizing a "Sidecar
 - Instrumentation: Micrometer Tracing (Brave/OTel Bridge).
 
 - Orchestration: Docker Desktop & Docker-Compose (Infrastructure-as-Code).
+
+📊 TPM R&D & Strategy Focus:
+This architecture is engineered to align with global site reliability and observability standards:
+
+- Context Propagation: Preserving traceId across RabbitMQ headers to ensure end-to-end transaction visibility.
+- Golden Signals Mapping: Specifically tracking Latency (time-in-queue), Traffic (msg/sec), Errors (DLX rates), and Saturation (queue depth).
+- Dashboards-as-Code: Providing pre-configured Grafana JSON models for immediate service deployment.
+- Anomaly Detection: R&D for identifying "Slow Consumers" using Prometheus histogram buckets ($le$).
+
+🛡 Reliability & Observability Features:
+- Distributed Tracing (Tempo): Visualizing the full lifecycle of a request from REST Controller $\rightarrow$ RabbitMQ $\rightarrow$ Consumer.
+- Native Prometheus Scraping: Utilizing RabbitMQ 3.8+ native /metrics endpoint for zero-agent infrastructure monitoring.
+- Micrometer Observation API: Using the latest Spring 6 Observation interface for unified logging, tracing, and metrics.
+- Dead Letter Monitoring: Automated alerting on DLX (Dead Letter Exchange) activity to catch serialization or logic errors.
+- Docker-Compose Orchestration: A repeatable, production-mirroring sandbox for local R&D and performance testing.
+
+
