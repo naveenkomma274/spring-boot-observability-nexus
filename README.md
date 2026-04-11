@@ -7,7 +7,7 @@ Architect/Development: Naveen Komma
 
 Project Status: Active Development | Phase 1 (Infrastructure & Telemetry Scaffolding)
 
-🎯 Business Objective (The Problem Statement)
+Business Objective (The Problem Statement)
 In high-traffic environments like Agoda, where thousands of microservices interact per second, "Blind Spots" in asynchronous communication are a major risk. Traditional monitoring often loses the thread when a request moves from a synchronous API into a message broker like RabbitMQ.
 
 The Pain Points:
@@ -17,10 +17,10 @@ The Pain Points:
 
 - Non-Standardized SLIs: Lack of a unified "Golden Signal" template for asynchronous producers and consumers.
 
-✅ The Solution: The Observability Nexus
+The Solution: The Observability Nexus
 This project acts as a Standardized Telemetry Blueprint. By utilizing a "Sidecar-ready" architecture, it ensures that every message published to the event bus is automatically instrumented with Context Propagation. It bridges the gap between infrastructure health and application performance, providing a single pane of glass for SRE and Product teams.
 
-🛠 Technology Stack & Frameworks
+Technology Stack & Frameworks
 
 - Message Broker: RabbitMQ 3.12+ (AMQP 0-9-1) with Management Plugin & Native Prometheus Exporter.
 
@@ -36,7 +36,7 @@ This project acts as a Standardized Telemetry Blueprint. By utilizing a "Sidecar
 
 - Orchestration: Docker Desktop & Docker-Compose (Infrastructure-as-Code).
 
-📊 TPM R&D & Strategy Focus:
+TPM R&D & Strategy Focus:
 This architecture is engineered to align with global site reliability and observability standards:
 
 - Context Propagation: Preserving traceId across RabbitMQ headers to ensure end-to-end transaction visibility.
@@ -44,11 +44,22 @@ This architecture is engineered to align with global site reliability and observ
 - Dashboards-as-Code: Providing pre-configured Grafana JSON models for immediate service deployment.
 - Anomaly Detection: R&D for identifying "Slow Consumers" using Prometheus histogram buckets ($le$).
 
-🛡 Reliability & Observability Features:
+Reliability & Observability Features:
 - Distributed Tracing (Tempo): Visualizing the full lifecycle of a request from REST Controller $\rightarrow$ RabbitMQ $\rightarrow$ Consumer.
 - Native Prometheus Scraping: Utilizing RabbitMQ 3.8+ native /metrics endpoint for zero-agent infrastructure monitoring.
 - Micrometer Observation API: Using the latest Spring 6 Observation interface for unified logging, tracing, and metrics.
 - Dead Letter Monitoring: Automated alerting on DLX (Dead Letter Exchange) activity to catch serialization or logic errors.
 - Docker-Compose Orchestration: A repeatable, production-mirroring sandbox for local R&D and performance testing.
 
+## Tech Stack
+* **Java 17 / Spring Boot 3**
+* **RabbitMQ** (Message Broker)
+* **Prometheus** (Metrics Ingestion)
+* **Grafana** (Visualization)
+* **Docker** (Containerization)
 
+## How to Run
+1. Start the infrastructure: `docker-compose up -d`
+2. Run the application: `mvn spring-boot:run`
+3. Access Health Metrics: `http://localhost:9090/actuator/health`
+4. Publish a Test Event: `http://localhost:9090/api/v1/publish?message=Clinical_Batch_001`

@@ -1,14 +1,12 @@
-version: '3.8'
-
 services:
-  # Message Broker with Management UI and Prometheus Exporter enabled by default
+  # Message Broker
   rabbitmq:
     image: rabbitmq:3.12-management
     container_name: rabbitmq-service
     ports:
-      - "5672:5672"   # RabbitMQ Protocol
-      - "15672:15672" # Management UI (Login: guest/guest)
-      - "15692:15692" # Prometheus Metrics Endpoint
+      - "5672:5672"   # AMQP Protocol (for IntelliJ to connect)
+      - "15672:15672" # Management UI (Browser)
+      - "15692:15692" # Prometheus Metrics Plugin
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -25,9 +23,11 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090"
+      - "9091:9090" # Host 9091 -> Container 9090 (Prevents conflict with your App)
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
+    depends_on:
+      - rabbitmq
 
   # Visualization
   grafana:
@@ -39,16 +39,3 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
       - prometheus
-
-  # Your Spring Boot App (Placeholder for your build)
-  app-service:
-    build: .
-    container_name: boot-app
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_PROMETHEUS_ENABLED=true
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
